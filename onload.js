@@ -18,10 +18,11 @@
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
-      
+
     serverParam = getParameterByName('server');
     userParam = getParameterByName('user');
     passwordParam = getParameterByName('password');
     dbParam = getParameterByName('db');
 
     mqttSub();
+    connectDB();

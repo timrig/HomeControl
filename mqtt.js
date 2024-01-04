@@ -11,18 +11,19 @@ function mqttPub(element) {
 
     const client = new Paho.Client(host, port, clientId);
 
-    client.onConnectionLost = onConnectionLost;
-    client.onMessageArrived = onMessageArrived;
+    client.onConnectionLost = onConnectionLostPub;
 
     const connectOptions = {
-        onSuccess: onConnect,
+        onSuccess: onConnectPub,
         userName: username,
         password: password,
         useSSL: true,
     };
-    client.connect(connectOptions);
+    function connectPub() {
+        client.connect(connectOptions);
+    }
 
-    function onConnect() {
+    function onConnectPub() {
         console.log('Verbunden zum MQTT Broker');
         var nachricht;
         var topic;
@@ -97,21 +98,17 @@ function mqttPub(element) {
             updateData(topic,false);
         }
         if(abbruch == false) {
-            client.subscribe("home/" + topic);
             client.publish("home/" + topic, nachricht)
         }
         else abbruch = false;
     }
 
-    function onConnectionLost(responseObject) {
+    function onConnectionLostPub(responseObject) {
         if (responseObject.errorCode !== 0) {
         console.log('Verbindung verloren: ' + responseObject.errorMessage);
         }
     }
-
-    function onMessageArrived(message) {
-        console.log('Nachricht empfangen - Topic: ' + message.destinationName + ', Nachricht: ' + message.payloadString);
-    }
+    connectPub();
 }
 
 function mqttSub() {

@@ -132,7 +132,10 @@ function mqttSub() {
         password: password,
         useSSL: true,
     };
-    client.connect(connectOptions);
+
+    function connect() {
+        client.connect(connectOptions);
+    }
 
     function onConnect() {
         console.log("Verbunden zum MQTT Broker");

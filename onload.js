@@ -18,7 +18,10 @@
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
-      var serverParam = getParameterByName('server');
-      var userParam = getParameterByName('user');
-      var passwordParam = getParameterByName('password');
-      var dbParam = getParameterByName('db');
+      
+    serverParam = getParameterByName('server');
+    userParam = getParameterByName('user');
+    passwordParam = getParameterByName('password');
+    dbParam = getParameterByName('db');
+
+    mqttSub();

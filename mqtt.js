@@ -1,3 +1,7 @@
+var serverParam;
+var userParam;
+var passwordParam;
+
 function mqttPub(element) {
     const host = serverParam;
     const port = 8884;

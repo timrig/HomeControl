@@ -1,3 +1,5 @@
+var dbParam;
+
 const firebaseConfig = {
     apiKey: dbParam,
     authDomain: "mfstreethomecontrol.firebaseapp.com",

@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>MF-Street</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, width=device-width, target-densitydpi=160dpi">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+        <script src="paho-mqtt-min.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    </head>
+    <body>
+        <div class="navigation" id="navigation">
+            <table class="navigation">
+                <tr class="drei">
+                    <td><button id="btnWohnzimmer" class="button-10_nav" onclick="wohnzimmerBtn()">Wohnzimmer</button></td>
+                    <td><button id="btnSchlafzimmer" class="button-10_nav" onclick="schlafzimmerBtn()">Schlafzimmer</button></td>
+                    <td><button id="btnKueche" class="button-10_nav" onclick="kuecheBtn()">K&uuml;che</button></td>
+                </tr>
+            </table>
+            <table>
+                <tr class="zwei">
+                    <td><button id="btnServer" class="button-10_nav" onclick="serverBtn()">Server</button></td>
+                    <td><button id="btnAllesAus" class="button-10_nav" onclick="allesAusBtn()">Ausschalten</button></td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        <div class="seite" id="wohnzimmer">
+            <table>
+                <tr class="drei">
+                    <td class="drei"><i class="fas fa-thermometer-half" style="color:#1874CD;"></i> <span style="font-size: 15px;"><span id="tempWZ" style="font-size: 15px;"></span>&#8451;</span></td>
+                    <td class="drei"><button class="diagram" onclick="toggle();" style="background-color:transparent; border:none;"><i class="fas fa-bars"></i></button></td>
+                    <td class="drei"><i class="fas fa-tint" style="color:#1874CD;"></i> <span style="font-size: 15px;"><span id="luftWZ"></span>&#037;</span></td>
+                </tr>
+            </table>
+            <div class="wrap"><iframe id="iframeTempWZ" class="dropdown-content" scrolling="no" src="https://thingspeak.com/channels/1561788/charts/1?dynamic=true&median=10&results=1440&round=2&title=Temperatur&type=line&xaxis=&yaxis=&yaxismax=25&yaxismin=15&api_key=VB3J74K24HO3JU2V"></iframe></div>
+            <div class="wrap"><iframe id="iframeLuftWZ" class="dropdown-content" scrolling="no" src="https://thingspeak.com/channels/1561788/charts/2?dynamic=true&median=10&results=1440&round=2&title=Luftfeuchtigkeit&type=line&xaxis=&yaxis=&yaxismax=85&yaxismin=40&api_key=VB3J74K24HO3JU2V"></iframe></div>
+            <hr><h4>Esstischlampe</h4>
+            <label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="esstisch"><span class="slider"></span></label>
+            <table>
+                <tr class="zwei">
+                    <td><button class="button3" onclick="mqttPub(this)" id="esstischDunkler"><i class="far fa-lightbulb" style="font-size:35px;"></i></button></td>
+                    <td><button class="button3" onclick="mqttPub(this)" id="esstischHeller"><i class="fas fa-lightbulb" style="font-size:35px;"></i></button></td>
+                </tr>
+            </table>
+            <hr><h4>Sideboard</h4>
+            <label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="sideboard"><span class="slider"></span></label><br>
+            <hr><h4>TV</h4>
+            <table>
+                <tr class="zwei">
+                    <td><button class="button3" onclick="mqttPub(this)" id="tvPower"><i class="fas fa-power-off" style="font-size:35px;"></i></button></td>
+                    <td><button class="button3" onclick="mqttPub(this)" id="tvInput">Input Switch</button></td>
+                </tr>
+                <tr class="zwei">
+                    <td><button class="button3" onclick="mqttPub(this)" id="tvLeiser"><i class="fas fa-volume-down" style="font-size:35px;"></i></button></td>
+                    <td><button class="button3" onclick="mqttPub(this)" id="tvLauter"><i class="fas fa-volume-up" style="font-size:35px;"></i></button></td>
+                </tr>
+            </table>
+            <hr><h4>HDMI Switch</h4>
+            <table>
+                <tr class="zwei">
+                    <td><button class="button3" onclick="mqttPub(this)" id="hdmiPS4"><i class="fab fa-playstation" style="font-size:35px;"></i></button></td>
+                    <td><button class="button3" onclick="mqttPub(this)" id="hdmiGoogle"><i class="fab fa-google" style="font-size:35px;"></i></button></td>
+                </tr>
+            </table>
+            <hr><h4>LED</h4>
+            <table>
+                <tr class="zwei">
+                    <td><p style="font-size: 18px;">Fernseher</p></td>
+                    <td><p style="font-size: 18px;">Esstisch</p></td>
+                </tr>
+                <tr class="zwei">
+                    <td><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="ledTV"><span class="slider"></span></label></td>
+                    <td><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="ledEsstisch"><span class="slider"></span></label></td>
+                </tr>
+            </table>
+            <p style="font-size: 18px">Farbe</p>
+            <p><button class="button3" onclick="mqttPub(this)" id="ledHome">Home</button></p>
+            <b><span id="sliderRotText" style="color: #b30000;font-size: 14px;"></span></b>
+            <div class="led"><input type="range" oninput="updateSlider(this,'rot')" id="sliderRot" class="sliderLED" min="0" max="255" step="1"></div>
+            <b><span id="sliderGruenText" style="color: #00b300;font-size: 14px;"></span></b>
+            <div class="led"><input type="range" oninput="updateSlider(this,'gruen')" id="sliderGruen" class="sliderLED" min="0" max="255" step="1"></div>
+            <b><span id="sliderBlauText" style="color: #0000b3;font-size: 14px;"></span></b>
+            <div class="led"><input type="range" oninput="updateSlider(this,'blau')" id="sliderBlau" class="sliderLED" min="0" max="255" step="1"></div><br>
+            <p><button class="button3" onclick="mqttPub('rgb')" id="ledSubmit">Best&auml;tigen</button></p>
+            <hr><h4>Stehlampe</h4>
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="stehlampeWZ"><span class="slider"></span></label></p>
+            <hr><h4>Lichterkette</h4>
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="lichterkette"><span class="slider"></span></label></p>
+            <hr><h4>Treibholz</h4>
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="treibholz"><span class="slider"></span></label></p>
+            <table>
+                <tr class="zwei">
+                    <td><button class="button3" onclick="mqttPub(this)" id="treibholzDunkler"><i class="far fa-lightbulb" style="font-size:35px;"></i></button></td>
+                    <td><button class="button3" onclick="mqttPub(this)" id="treibholzHeller"><i class="fas fa-lightbulb" style="font-size:35px;"></i></button></td>
+                </tr>
+            </table><br>
+            <h4>Timer</h4>
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="timer"><span class="slider"></span></label></p>
+            <p style="font-size: 12px;">eingestellt auf:<br><span id="timerEinstellung"></span></p><br>
+            <p><input type="time" id="timerZeit" style="font-size: 18px;"></p><br>
+            <table>
+                <tr class="zwei">
+                    <td><input type="radio" id="timer4h" name="intervall" value="4h"><label for ="timer4h" style="font-size: 18px;"><p style="font-size: 18px;">&nbsp;4h</p></label></td>
+                    <td><input type="radio" id="timer6h" name="intervall" value="6h"><label for ="timer6h" style="font-size: 18px;"><p style="font-size: 18px;">&nbsp;6h</p></label></td>
+                </tr>
+            </table>
+            <button class="button3" onclick="mqttPub('timer')" id="timer">Best&auml;tigen</button><br>
+        </div>
+        <div class="seite" id="schlafzimmer">
+            <table>
+                <tr class="drei">
+                    <td class="drei"><i class="fas fa-thermometer-half" style="color:#1874CD;"></i> <span style="font-size: 15px;"><span id="tempSZ" style="font-size: 15px;"></span>&#8451;</span></td>
+                    <td class="drei"><button class="diagram" onclick="toggle();" style="background-color:transparent; border:none;"><i class="fas fa-bars"></i></button></td>
+                    <td class="drei"><i class="fas fa-tint" style="color:#1874CD;"></i> <span style="font-size: 15px;"><span id="luftSZ"></span>&#037;</span></td>
+                </tr>
+            </table>
+            <div class="wrap"><iframe id="iframeTempSZ" class="dropdown-content" scrolling="no" src="https://thingspeak.com/channels/1563238/charts/1?dynamic=true&median=10&results=1440&round=2&title=Temperatur&type=line&xaxis=&yaxis=&yaxismax=25&yaxismin=15&api_key=HFQPK7LE7SVV8KOJ"></iframe></div>
+            <div class="wrap"><iframe id="iframeLuftSZ" class="dropdown-content" scrolling="no" src="https://thingspeak.com/channels/1563238/charts/2?dynamic=true&median=10&results=1440&round=2&title=Luftfeuchtigkeit&type=line&xaxis=&yaxis=&yaxismax=85&yaxismin=40&api_key=HFQPK7LE7SVV8KOJ"></iframe></div>
+            <hr><h4>Stehlampe</h4>
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="stehlampeSZ"><span class="slider"></span></label></p>
+        </div>
+        <div class="seite" id="kueche">
+            <h4>Einen Deckenstrahler</h4>
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="kueche1"><span class="slider"></span></label></p>
+            <hr><h4>Zwei Deckenstrahler</h4>
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="kueche2"><span class="slider"></span></label></p>
+        </div>
+        <div class="seite" id="server">
+            <p><label class="switch"><input type="checkbox" onchange="mqttPub(this)" id="serverPower"><span class="slider"></span></label></p>
+            <hr><br>
+            <p><button class="button3" onclick="mqttPub(this)" id="serverBackup">Starte Backup</button></p>
+            <p style="font-size: 12px;">Letztes Backup:<br><span id="serverEinstellung"></span></p>
+        </div>
+        <div class="seite" id="allesaus">
+            <p><button class="button3" onclick="mqttPub(this)" id="ausschalten" style="width: 130px;">Alles ausschalten</button></p>
+        </div>
+        <script src="onload.js"></script>
+        <script src="script.js"></script>
+        <script src="navigation.js"></script>
+        <script src="mqtt.js"></script>
+        <script src="firebase.js"></script>
+    </body>
+</html>

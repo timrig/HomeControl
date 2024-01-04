@@ -109,3 +109,47 @@ function mqttPub(element) {
         console.log('Nachricht empfangen - Topic: ' + message.destinationName + ', Nachricht: ' + message.payloadString);
     }
 }
+
+function mqttSub() {
+    const host = serverParam;
+    const port = 8884;
+    const clientId = 'mqtt_js_' + Math.random().toString(16).substr(2, 8);
+    const username = userParam;
+    const password = passwordParam;
+
+    const client = new Paho.Client(host, port, clientId);
+
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = onMessageArrived;
+
+    const connectOptions = {
+        onSuccess: onConnect,
+        userName: username,
+        password: password,
+        useSSL: true,
+    };
+    client.connect(connectOptions);
+
+    function onConnect() {
+        console.log("Verbunden zum MQTT Broker");
+        isConnected = true;
+        client.subscribe("home/esp/#");
+    }
+
+    function onConnectionLost(responseObject) {
+        if (responseObject.errorCode !== 0) {
+            isConnected = false;
+            console.log("Verbindung verloren: " + responseObject.errorMessage);
+            // Versuche alle 5 Sekunden eine erneute Verbindung
+            setTimeout(connect, 5000);
+        }
+    }
+
+    function onMessageArrived(message) {
+        console.log('Nachricht empfangen - Topic: ' + message.destinationName + ', Nachricht: ' + message.payloadString);
+        const messageArray = message.payloadString.split(",");
+        if(messageArray[1] == "on") document.getElementById(messageArray[0]).checked = true;
+        else if(messageArray[1] == "off") document.getElementById(messageArray[0]).checked = false;
+    }
+    connect();
+}

@@ -1,4 +1,5 @@
 var dbParam;
+var database;
 
 function connectDB() {
     const firebaseConfig = {
@@ -13,7 +14,7 @@ function connectDB() {
     };
 
     firebase.initializeApp(firebaseConfig);
-    var database = firebase.database();
+    database = firebase.database();
     const ref = database.ref('Zustaende');
 
     ref.on('value', (snapshot) => {

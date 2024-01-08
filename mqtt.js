@@ -137,7 +137,7 @@ function mqttSub() {
     function onConnect() {
         console.log("Verbunden zum MQTT Broker");
         isConnected = true;
-        client.subscribe("home/esp/#");
+        client.subscribe("home/esp32/#");
     }
 
     function onConnectionLost(responseObject) {

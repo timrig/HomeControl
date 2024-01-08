@@ -42,7 +42,7 @@ function mqttPub(element) {
             updateData("sliderGruenText",ledGruen);
             updateData("sliderBlauText",ledBlau);
         }
-        else if(element == "timer") {
+        else if(element == "timerLEDPub") {
             var zeit = document.getElementById("timerZeit").value;
             topic = element;
             if(document.getElementById("timer4h").checked) {
@@ -152,8 +152,8 @@ function mqttSub() {
     function onMessageArrived(message) {
         console.log('Nachricht empfangen - Topic: ' + message.destinationName + ', Nachricht: ' + message.payloadString);
         const messageArray = message.payloadString.split(",");
-        if(messageArray[1] == "on") document.getElementById(messageArray[0]).checked = true;
-        else if(messageArray[1] == "off") document.getElementById(messageArray[0]).checked = false;
+        if(messageArray[1] == "on") updateData(messageArray[0],true);
+        else if(messageArray[1] == "off") updateData(messageArray[0],false);
     }
     connect();
 }
